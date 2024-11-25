@@ -19,6 +19,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import CloudIcon from '@mui/icons-material/Cloud';
+import WavesIcon from '@mui/icons-material/Waves';
 import GrainIcon from '@mui/icons-material/Grain';
 import OpacityIcon from '@mui/icons-material/Opacity';
 import ThermostatIcon from '@mui/icons-material/Thermostat';
@@ -222,6 +223,18 @@ export default function Layout({ children }) {
             <ListItemText primary="Analytics" />
               </ListItemButton>
                 </ListItem>
+            <ListItem key="RiversData"
+              disablePadding
+              className={pathname.startsWith("/riversdata") ? "text-sky-600" : "text-slate-700"}
+              onClick={() => { router.push("/riversdata") }}>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <WavesIcon sx={{ color: 'blue' }} />
+                  </ListItemIcon>
+                  <ListItemText primary="Rivers Data" />
+                </ListItemButton>
+              
+            </ListItem>
 
 
             {/* Forecast Dropdown */}
