@@ -1,74 +1,106 @@
 "use client";
 import React from 'react';
-import Layout from "../components/layout";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
+import Layout from "@/app/components/layout";
+import { Bar, Line } from 'react-chartjs-2'; // Assuming you're using Chart.js for charts
+import { Table, Card } from 'react-bootstrap'; // Import from react-bootstrap
+import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap CSS is loaded
 
-// Sample data for the charts
-const barChartData = [
-  { name: 'January', value: 4000 },
-  { name: 'February', value: 3000 },
-  { name: 'March', value: 2000 },
-  { name: 'April', value: 2780 },
-  { name: 'May', value: 1890 },
-  { name: 'June', value: 2390 },
-  { name: 'July', value: 3490 },
+// Precipitation Data (Example Data)
+const precipitationData = [
+  { month: 'Jan', value: 120 },
+  { month: 'Feb', value: 150 },
+  { month: 'Mar', value: 110 },
+  { month: 'Apr', value: 80 },
+  { month: 'May', value: 200 },
+  { month: 'Jun', value: 180 },
+  { month: 'Jul', value: 300 },
+  { month: 'Aug', value: 250 },
+  { month: 'Sep', value: 180 },
+  { month: 'Oct', value: 220 },
+  { month: 'Nov', value: 190 },
+  { month: 'Dec', value: 160 },
 ];
 
-const pieChartData = [
-  { name: 'Group A', value: 400 },
-  { name: 'Group B', value: 300 },
-  { name: 'Group C', value: 300 },
-  { name: 'Group D', value: 200 },
-];
+// Calculate Total Precipitation
+const totalPrecipitation = precipitationData.reduce((acc, curr) => acc + curr.value, 0);
 
-// Define colors for the pie chart
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+// Bar chart for monthly precipitation
+const barChartData = {
+  labels: precipitationData.map(data => data.month),
+  datasets: [
+    {
+      label: 'Monthly Precipitation (mm)',
+      data: precipitationData.map(data => data.value),
+      backgroundColor: 'rgba(54, 162, 235, 0.5)',
+      borderColor: 'rgba(54, 162, 235, 1)',
+      borderWidth: 1,
+    },
+  ],
+};
 
-export default function Analytics() {
+// Line chart for monthly trends
+const lineChartData = {
+  labels: precipitationData.map(data => data.month),
+  datasets: [
+    {
+      label: 'Precipitation Trend (mm)',
+      data: precipitationData.map(data => data.value),
+      fill: false,
+      backgroundColor: 'rgba(75, 192, 192, 1)',
+      borderColor: 'rgba(75, 192, 192, 1)',
+      borderWidth: 2,
+    },
+  ],
+};
+
+export default function PrecipitationPage() {
   return (
     <Layout>
+      <h2>Precipitation Overview</h2>
 
-      <h2>Monthly Data Overview</h2><br />
-      <BarChart
-        width={600}
-        height={300}
-        data={barChartData}
-        margin={{
-          top: 5, right: 30, left: 20, bottom: 5,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="value" fill="#8884d8" />
-      </BarChart>
+      <Card className="mb-4">
+        <Card.Body>
+          <h4>Total Annual Precipitation</h4>
+          <p><strong>{totalPrecipitation} mm</strong></p>
+        </Card.Body>
+      </Card>
 
-      <h2>Distribution of Groups</h2>
-      <PieChart width={400} height={400}>
-        <Pie
-          data={pieChartData}
-          cx={200}
-          cy={200}
-          labelLine={false}
-          label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-          outerRadius={80}
-          fill="#8884d8"
-          dataKey="value"
-        >
-          {pieChartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+      <h3>Precipitation Data Table</h3>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>Precipitation (mm)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {precipitationData.map((data, index) => (
+            <tr key={index}>
+              <td>{data.month}</td>
+              <td>{data.value}</td>
+            </tr>
           ))}
-        </Pie>
-        <Tooltip />
-      </PieChart>
+        </tbody>
+      </Table>
 
-      <h2>Insights and Recommendations</h2>
+      <h3>Monthly Precipitation Trends</h3>
+      <Bar data={barChartData} options={{ responsive: true, plugins: { title: { display: true, text: 'Monthly Precipitation (mm)' } } }} />
+
+      <h3>Precipitation Trend Over the Year</h3>
+      <Line data={lineChartData} options={{ responsive: true, plugins: { title: { display: true, text: 'Yearly Precipitation Trend (mm)' } } }} />
+
+      <h3>Monthly Precipitation Summary</h3>
       <ul>
-        <li><strong>Monthly Trends:</strong> The bar chart indicates a steady increase in metrics from January to July, with a peak in July. Consider exploring the factors that contributed to this growth.</li>
-        <li><strong>Group Distribution:</strong> The pie chart shows that Group A holds the largest share. Assess the performance of this group and identify potential areas for optimization.</li>
-        <li><strong>Actionable Insights:</strong> Use this data to guide your strategy. Focus on enhancing the strengths of your top-performing metrics and addressing any weaknesses highlighted by the charts.</li>
+        <li><strong>Highest Precipitation:</strong> {Math.max(...precipitationData.map(data => data.value))} mm</li>
+        <li><strong>Lowest Precipitation:</strong> {Math.min(...precipitationData.map(data => data.value))} mm</li>
+        <li><strong>Average Precipitation:</strong> {(totalPrecipitation / precipitationData.length).toFixed(2)} mm</li>
+      </ul>
+
+      <h3>Recommendations / Insights</h3>
+      <ul>
+        <li><strong>Actionable Insight:</strong> The highest precipitation occurs in July, which might indicate monsoon season. Ensure proper drainage systems are in place for this period.</li>
+        <li><strong>Strategy:</strong> Focus on water conservation during the months with lower precipitation (e.g., January-April).</li>
+        <li><strong>Analysis:</strong> A significant decrease in precipitation from June to August should be considered for agricultural planning.</li>
       </ul>
     </Layout>
   );

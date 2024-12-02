@@ -123,7 +123,7 @@ export default function Dashboard() {
               <h2 className="text-xl font-bold text-gray-800 mb-2">Tarbela Data</h2>
               {/* Dropdown to select region */}
               <select
-                className="mb-2 bg-slate-300 p-2 rounded-lg focus:ring focus:bg-white "
+                className="mb-2 bg-slate-300 p-2 rounded-lg focus:ring focus:bg-white cursor-pointer"
                 name="regions"
                 id="regions"
                 value={selectedRegion}

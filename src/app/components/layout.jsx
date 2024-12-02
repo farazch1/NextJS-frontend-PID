@@ -238,38 +238,14 @@ export default function Layout({ children }) {
 
 
             {/* Forecast Dropdown */}
-            <ListItemButton onClick={handleClickForecast} className={pathname.startsWith("/forecast") ? "text-sky-600" : "text-slate-700"}>
-              <ListItemIcon>
-                <CloudIcon sx={{ color: 'orange' }} />
+            <ListItem key="Forecast" disablePadding className={pathname.startsWith("/forecast") ? "text-sky-600" : "text-slate-700"} onClick={() => { router.push("/forecast") }}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <CloudIcon sx={{ color: 'orange' }} /> {/* Replaced DashboardIcon with PieChartIcon */}
               </ListItemIcon>
-              <ListItemText primary="Forecast" />
-              {openForecast ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-            <Collapse in={openForecast} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 4 }} className={pathname === "/forecast/kharif-forecast" ? "text-sky-600" : "text-slate-700"} 
-      onClick={() => { router.push("/forecast/kharif-forecast") }}>
-                  <ListItemIcon>
-                    <CloudIcon sx={{ color: 'orange' }} />
-                  </ListItemIcon>
-                  <ListItemText primary="Kharif Forecast" />
-                </ListItemButton>
-                <ListItemButton sx={{ pl: 4 }} className={pathname === "/forecast/rabi-forecast" ? "text-sky-600" : "text-slate-700"} 
-      onClick={() => { router.push("/forecast/rabi-forecast") }}>
-                  <ListItemIcon>
-                    <GrainIcon sx={{ color: 'green' }} />
-                  </ListItemIcon>
-                  <ListItemText primary="Rabi Forecast" />
-                </ListItemButton>
-                <ListItemButton sx={{ pl: 4 }} className={pathname === "/forecast/daily-forecast" ? "text-sky-600" : "text-slate-700"} 
-      onClick={() => { router.push("/forecast/daily-forecast") }}>
-                  <ListItemIcon>
-                    <CloudIcon sx={{ color: 'blue' }} />
-                  </ListItemIcon>
-                  <ListItemText primary="10 Daily Forecast" />
-                </ListItemButton>
-              </List>
-            </Collapse>
+            <ListItemText primary="Forecast" />
+              </ListItemButton>
+                </ListItem>
 
             <Divider />
             {/* Other Menu Items */}
@@ -359,12 +335,12 @@ export default function Layout({ children }) {
   </List>
 </Collapse>
             <Divider />
-            <ListItem key="References" disablePadding className={pathname.startsWith("/references") ? "text-sky-600" : "text-slate-700"} onClick={() => { router.push("/references") }}>
+            <ListItem key="Schmetic" disablePadding className={pathname.startsWith("/schmetic") ? "text-sky-600" : "text-slate-700"} onClick={() => { router.push("/schmetic") }}>
               <ListItemButton>
                 <ListItemIcon>
                   <ReferenceIcon sx={{ color: 'grey' }} />
                 </ListItemIcon>
-                <ListItemText primary="References" />
+                <ListItemText primary="Schmetic" />
               </ListItemButton>
             </ListItem>
           </List>

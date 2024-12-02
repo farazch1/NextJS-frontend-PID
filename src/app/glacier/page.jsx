@@ -1,75 +1,123 @@
 "use client";
-import React from 'react';
+import React, { useState } from "react";
 import Layout from "../components/layout";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
+import { Box, Typography, Grid, TextField, FormControl, RadioGroup, FormControlLabel, Radio, Button, MenuItem } from "@mui/material";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, AreaChart, Area, ScatterChart, Scatter, RadialBarChart, RadialBar } from "recharts";
 
-// Sample data for the charts
-const barChartData = [
-  { name: 'January', value: 4000 },
-  { name: 'February', value: 3000 },
-  { name: 'March', value: 2000 },
-  { name: 'April', value: 2780 },
-  { name: 'May', value: 1890 },
-  { name: 'June', value: 2390 },
-  { name: 'July', value: 3490 },
+// Sample glacier-related data for the charts (Snow accumulation, meltwater, mass balance)
+const glacierData = [
+  { name: "January", SnowAccumulation: 120, MeltwaterFlow: 80, MassBalance: 40 },
+  { name: "February", SnowAccumulation: 110, MeltwaterFlow: 90, MassBalance: 20 },
+  { name: "March", SnowAccumulation: 100, MeltwaterFlow: 110, MassBalance: -10 },
+  { name: "April", SnowAccumulation: 80, MeltwaterFlow: 120, MassBalance: -40 },
+  { name: "May", SnowAccumulation: 60, MeltwaterFlow: 130, MassBalance: -70 },
+  { name: "June", SnowAccumulation: 50, MeltwaterFlow: 150, MassBalance: -100 },
+  { name: "July", SnowAccumulation: 30, MeltwaterFlow: 180, MassBalance: -150 },
 ];
 
-const pieChartData = [
-  { name: 'Group A', value: 400 },
-  { name: 'Group B', value: 300 },
-  { name: 'Group C', value: 300 },
-  { name: 'Group D', value: 200 },
-];
+export default function GlacierPage() {
+  const [plotType, setPlotType] = useState("AreaChart");
+  const [factor, setFactor] = useState("MeltwaterFlow");
+  const [selectedData, setSelectedData] = useState(glacierData);
 
-// Define colors for the pie chart
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  const handlePlotTypeChange = (event) => {
+    setPlotType(event.target.value);
+  };
 
-export default function Glacier() {
+  const handleFactorChange = (event) => {
+    setFactor(event.target.value);
+  };
+
+  const handleView = () => {
+    // Logic for filtering data or updating chart based on inputs can go here
+    console.log("Viewing glacier data...");
+  };
+
   return (
     <Layout>
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          Glacier Melt and Water Flow Impact on Irrigation
+        </Typography>
+        <Grid container spacing={3}>
+          {/* Input Section */}
+          <Grid item xs={12} md={4}>
+            <Box sx={{ p: 2, border: "1px solid #ccc", borderRadius: "8px" }}>
+              <FormControl fullWidth margin="normal">
+                <TextField label="Glacier" select>
+                  <MenuItem value="Glacier1">Glacier 1</MenuItem>
+                  <MenuItem value="Glacier2">Glacier 2</MenuItem>
+                </TextField>
+              </FormControl>
+              <FormControl fullWidth margin="normal">
+                <TextField label="From Date" type="date" InputLabelProps={{ shrink: true }} />
+              </FormControl>
+              <FormControl fullWidth margin="normal">
+                <TextField label="To Date" type="date" InputLabelProps={{ shrink: true }} />
+              </FormControl>
+              <FormControl component="fieldset" margin="normal">
+                <Typography>Plotting Factor:</Typography>
+                <RadioGroup value={factor} onChange={handleFactorChange} row>
+                  <FormControlLabel value="SnowAccumulation" control={<Radio />} label="Snow Accumulation" />
+                  <FormControlLabel value="MeltwaterFlow" control={<Radio />} label="Meltwater Flow" />
+                  <FormControlLabel value="MassBalance" control={<Radio />} label="Mass Balance" />
+                </RadioGroup>
+              </FormControl>
+              <FormControl component="fieldset" margin="normal">
+                <Typography>Plot Type:</Typography>
+                <RadioGroup value={plotType} onChange={handlePlotTypeChange} row>
+                  <FormControlLabel value="AreaChart" control={<Radio />} label="Area Chart" />
+                  <FormControlLabel value="BarChart" control={<Radio />} label="Stacked Bar Chart" />
+                  <FormControlLabel value="ScatterChart" control={<Radio />} label="Scatter Plot" />
+                  <FormControlLabel value="RadialBarChart" control={<Radio />} label="Radial Bar Chart" />
+                </RadioGroup>
+              </FormControl>
+              <Button variant="contained" color="primary" fullWidth onClick={handleView}>
+                View
+              </Button>
+            </Box>
+          </Grid>
 
-      <h2>Monthly Data Overview</h2><br />
-      <BarChart
-        width={600}
-        height={300}
-        data={barChartData}
-        margin={{
-          top: 5, right: 30, left: 20, bottom: 5,
-        }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="value" fill="#8884d8" />
-      </BarChart>
-
-      <h2>Distribution of Groups</h2>
-      <PieChart width={400} height={400}>
-        <Pie
-          data={pieChartData}
-          cx={200}
-          cy={200}
-          labelLine={false}
-          label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-          outerRadius={80}
-          fill="#8884d8"
-          dataKey="value"
-        >
-          {pieChartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Pie>
-        <Tooltip />
-      </PieChart>
-
-      <h2>Insights and Recommendations</h2>
-      <ul>
-        <li><strong>Monthly Trends:</strong> The bar chart indicates a steady increase in metrics from January to July, with a peak in July. Consider exploring the factors that contributed to this growth.</li>
-        <li><strong>Group Distribution:</strong> The pie chart shows that Group A holds the largest share. Assess the performance of this group and identify potential areas for optimization.</li>
-        <li><strong>Actionable Insights:</strong> Use this data to guide your strategy. Focus on enhancing the strengths of your top-performing metrics and addressing any weaknesses highlighted by the charts.</li>
-      </ul>
+          {/* Chart Section */}
+          <Grid item xs={12} md={8}>
+            {plotType === "AreaChart" ? (
+              <AreaChart width={600} height={300} data={selectedData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Area type="monotone" dataKey={factor} fill="#8884d8" stroke="#8884d8" />
+              </AreaChart>
+            ) : plotType === "BarChart" ? (
+              <BarChart width={600} height={300} data={selectedData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="SnowAccumulation" stackId="a" fill="#8884d8" />
+                <Bar dataKey="MeltwaterFlow" stackId="a" fill="#82ca9d" />
+                <Bar dataKey="MassBalance" stackId="a" fill="#ffc658" />
+              </BarChart>
+            ) : plotType === "ScatterChart" ? (
+              <ScatterChart width={600} height={300}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="SnowAccumulation" />
+                <YAxis dataKey="MeltwaterFlow" />
+                <Tooltip />
+                <Scatter name="Meltwater vs Snowfall" data={selectedData} fill="#8884d8" />
+              </ScatterChart>
+            ) : (
+              <RadialBarChart width={600} height={300} innerRadius="10%" outerRadius="80%" data={selectedData}>
+                <RadialBar minAngle={15} label={{ position: "insideStart", fill: "#fff" }} background clockWise dataKey="MassBalance" />
+                <Legend />
+                <Tooltip />
+              </RadialBarChart>
+            )}
+          </Grid>
+        </Grid>
+      </Box>
     </Layout>
   );
 }

@@ -94,7 +94,7 @@ export default function RiversData() {
           <h2 className="text-xl font-bold text-gray-800 mb-2">Rivers Data</h2>
           {/* Dropdown to select region */}
           <select
-            className="mb-2 ml-5 bg-slate-300 p-1 rounded-lg focus:ring focus:bg-white "
+            className="mb-2 ml-5 bg-slate-300 p-1 rounded-lg focus:ring focus:bg-white cursor-pointer"
             name="regions"
             id="regions"
             value={selectedRegion}
