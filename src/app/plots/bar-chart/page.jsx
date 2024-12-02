@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import Layout from "../../../components/layout"; // Corrected path
+import Layout from '../../components/layout' // Corrected path
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
 
 // Sample data for the charts
