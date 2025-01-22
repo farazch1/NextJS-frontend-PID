@@ -39,7 +39,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (selectedRegion === 'Tarbela') {
       const query = `
-        MATCH (d:Record) RETURN(d) LIMIT 10
+        MATCH (d:Tarbela) RETURN(d) LIMIT 10
       `;
       fetchData(query);
     }
@@ -54,6 +54,8 @@ export default function Dashboard() {
     if (myChartRef.current) {
       myChartRef.current.destroy();
     }
+
+    
 
     myChartRef.current = new Chart(ctx, {
       type: "bar",
@@ -80,6 +82,15 @@ export default function Dashboard() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (data.length > 0) {
+        // const usefulKeys = lengthOfObject(data, 0);
+        // console.log("Number of useful headings:", Object.keys(data[0])[0]);
+        // document.querySelector(".datess").innerHTML = Object.keys(data[0])[0];
+        console.log(data);
+      }
+  },[data]);
 
   return (
     <Layout>
@@ -149,7 +160,7 @@ export default function Dashboard() {
               <tbody>
                 {data.map((item, index) => (
                   <tr key={index}>
-                    <td className="px-2 py-1 border-b border-gray-300">{item.date}</td>
+                    <td className="px-2 py-1 border-b border-gray-300">{`${item.date.day.low}/${item.date.month.low}/${item.date.year.low}`}</td>
                     <td className="px-2 py-1 border-b border-gray-300">{item.tarbela_outflows.low}</td>
                     <td className="px-2 py-1 border-b border-gray-300">{item.kabul_river.low}</td>
                     <td className="px-2 py-1 border-b border-gray-300">{item.thal_canal.low}</td>
