@@ -1,6 +1,6 @@
-"use server";
 const express = require('express');
 const sql = require("msnodesqlv8");
+const { json } = require('stream/consumers');
 
 const app = express();
 const serverName = "LATUTUDE_7390\\SQLEXPRESS";
@@ -31,6 +31,50 @@ app.post('/data', (req, res) => {
     }
   });
 });
+
+// app.get('/data', (req, res) => {
+//   const barrage = req.query.name;
+//   const date = req.query.date;
+//   let querys = `SELECT * FROM [Twin].[dbo].[${barrage}] WHERE Date = ${date}`;
+//   sql.query(connectionString, querys, (err, rows) =>{
+//     if(err){
+//       res.send("error");
+//     }
+//     res.json(rows);
+//   })
+// });
+
+
+
+
+app.get('/data', (req, res) => {
+  const barrage = req.query.name;
+  const date = req.query.date;
+
+  // Validate parameters
+  if (!barrage || !date) {
+    return res.status(400).send({ message: 'Missing required query parameters: name or date' });
+  }
+
+  // Ensure the table name is sanitized
+  const allowedTables = ['1', 'table2', 'table3']; // Add your valid table names here
+  if (!allowedTables.includes(barrage)) {
+    return res.status(400).send({ message: 'Invalid table name' });
+  }
+
+  // Use parameterized query to avoid SQL injection and handle date type
+  const querys = `SELECT * FROM [Twin].[dbo].[${barrage}] WHERE Date = '${date}'`;
+  
+  sql.query(connectionString, querys, (err, rows) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      return res.status(500).send({ message: 'Error fetching data', error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
+
 
 // Remove the GET endpoint as it's not used for dynamic queries
 
