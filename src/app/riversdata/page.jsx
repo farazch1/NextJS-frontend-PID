@@ -189,6 +189,107 @@
 //   );
 // }
 
+// "use client";
+// import Layout from "../components/layout";
+// import React, { useState } from "react";
+// import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from "chart.js";
+// import { Bar } from "react-chartjs-2";
+// import useDataFetcher from "../scripts/dataFetcher";
+
+// ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
+
+// export default function RiversData() {
+//   const [query, setQuery] = useState("SELECT * From barrage");
+//   const [selectedRegion, setSelectedRegion] = useState("Tarbela");
+
+//   const handleButtonAClick = (barrageName) => {
+//     setQuery(`SELECT * from barrage where Name = 'Barrage ${barrageName}'`);
+//   };
+
+//   const { data, error } = useDataFetcher(query); // Using the hook
+
+//   const chartData = {
+//     labels: data.map(item => `${item.name}`),
+//     datasets: [
+//       {
+//         label: selectedRegion === "Tarbela" ? "Tarbela Outflows" : "Chashma Upstream",
+//         data: data.map(item => selectedRegion === "Tarbela" ? item.tarbela_outflows : item.chashma_upstream),
+//         backgroundColor: "rgba(75, 192, 192, 0.6)",
+//       },
+//       {
+//         label: selectedRegion === "Tarbela" ? "Kabul River" : "Loss and Gain",
+//         data: data.map(item => selectedRegion === "Tarbela" ? item.kabul_river : item.loss_and_gain),
+//         backgroundColor: "rgba(153, 102, 255, 0.6)",
+//       },
+//       {
+//         label: selectedRegion === "Tarbela" ? "Thal Canal" : "Chashma Downstream",
+//         data: data.map(item => selectedRegion === "Tarbela" ? item.thal_canal : item.chashma_downstream),
+//         backgroundColor: "rgba(255, 159, 64, 0.6)",
+//       },
+//     ].filter(dataset => dataset.data.some(value => value !== null)),
+//   };
+
+//   return (
+//     <Layout>
+//       {/* Table Section */}
+//       <div className="max-h-96 overflow-y-scroll bg-white pb-2 pl-2 pr-2 rounded-lg shadow-md">
+//         <div className="mt-2 pb-2 sticky top-0 flex bg-white">
+//           <h2 className="text-xl font-bold text-gray-800 mb-2">Rivers Data</h2>
+//           <select
+//             className="mb-2 ml-5 bg-slate-300 p-1 rounded-lg focus:ring focus:bg-white cursor-pointer"
+//             value={selectedRegion}
+//             onChange={(e) => handleButtonAClick('A')}
+//           >
+//             <option value="Tarbela">Tarbela</option>
+//             <option value="Chashma">Chashma</option>
+//           </select>
+//           {error && <p style={{ color: "red" }}>Error: {error}</p>}
+//         </div>
+//         {data.length > 0 ? (
+//           <table className="min-w-full bg-white border border-gray-300 table-fixed">
+//             <thead className="sticky top-10">
+//               <tr className="bg-gray-200">
+//                 <th className="px-2 py-1 text-left text-sm font-semibold text-gray-800 border-b border-gray-300">Date</th>
+//                 <th className="px-2 py-1 text-left text-sm font-semibold text-gray-800 border-b border-gray-300">
+//                   {selectedRegion === "Tarbela" ? "Tarbela Outflows" : "Chashma Upstream"}
+//                 </th>
+//                 <th className="px-2 py-1 text-left text-sm font-semibold text-gray-800 border-b border-gray-300">
+//                   {selectedRegion === "Tarbela" ? "Kabul River" : "Loss and Gain"}
+//                 </th>
+//                 <th className="px-2 py-1 text-left text-sm font-semibold text-gray-800 border-b border-gray-300">
+//                   {selectedRegion === "Tarbela" ? "Thal Canal" : "Chashma Downstream"}
+//                 </th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {data.map((item, index) => (
+//                 <tr key={index}>
+//                   <td className="px-2 py-1 border-b border-gray-300">
+//                     {`${item.Name}`}
+//                   </td>
+//                   <td className="px-2 py-1 border-b border-gray-300">
+//                     {selectedRegion === "Tarbela" ? item.name : item.chashma_upstream}
+//                   </td>
+//                   <td className="px-2 py-1 border-b border-gray-300">
+//                     {selectedRegion === "Tarbela" ? item.kabul_river : item.loss_and_gain}
+//                   </td>
+//                   <td className="px-2 py-1 border-b border-gray-300">
+//                     {selectedRegion === "Tarbela" ? item.thal_canal : item.chashma_downstream}
+//                   </td>
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         ) : (
+//           <p>No data available</p>
+//         )}
+//       </div>
+//       <div className="w-1/2">
+//         <Bar data={chartData} />
+//       </div>
+//     </Layout>
+//   );
+// }
 "use client";
 import Layout from "../components/layout";
 import React, { useState } from "react";
@@ -199,31 +300,29 @@ import useDataFetcher from "../scripts/dataFetcher";
 ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
 export default function RiversData() {
-  const [query, setQuery] = useState("SELECT * From barrage");
-  const [selectedRegion, setSelectedRegion] = useState("Tarbela");
+  const [reach, setReach] = useState("Tarbela_to_Chashma");
+  const [startDate, setStartDate] = useState("1994-03-29"); // Example start date
+  const [endDate, setEndDate] = useState("1994-04-02"); // Example end date
+  const [rivSelection, setRivSelection] = useState("Pnj"); // Example river selection
 
-  const handleButtonAClick = (barrageName) => {
-    setQuery(`SELECT * from barrage where Name = 'Barrage ${barrageName}'`);
-  };
-
-  const { data, error } = useDataFetcher(query); // Using the hook
+  const { data, error } = useDataFetcher(reach, startDate, endDate, rivSelection);
 
   const chartData = {
     labels: data.map(item => `${item.name}`),
     datasets: [
       {
-        label: selectedRegion === "Tarbela" ? "Tarbela Outflows" : "Chashma Upstream",
-        data: data.map(item => selectedRegion === "Tarbela" ? item.tarbela_outflows : item.chashma_upstream),
+        label: reach === "Tarbela" ? "Tarbela Outflows" : "Chashma Upstream",
+        data: data.map(item => reach === "Tarbela" ? item.tarbela_outflows : item.chashma_upstream),
         backgroundColor: "rgba(75, 192, 192, 0.6)",
       },
       {
-        label: selectedRegion === "Tarbela" ? "Kabul River" : "Loss and Gain",
-        data: data.map(item => selectedRegion === "Tarbela" ? item.kabul_river : item.loss_and_gain),
+        label: reach === "Tarbela" ? "Kabul River" : "Loss and Gain",
+        data: data.map(item => reach === "Tarbela" ? item.kabul_river : item.loss_and_gain),
         backgroundColor: "rgba(153, 102, 255, 0.6)",
       },
       {
-        label: selectedRegion === "Tarbela" ? "Thal Canal" : "Chashma Downstream",
-        data: data.map(item => selectedRegion === "Tarbela" ? item.thal_canal : item.chashma_downstream),
+        label: reach === "Tarbela" ? "Thal Canal" : "Chashma Downstream",
+        data: data.map(item => reach === "Tarbela" ? item.thal_canal : item.chashma_downstream),
         backgroundColor: "rgba(255, 159, 64, 0.6)",
       },
     ].filter(dataset => dataset.data.some(value => value !== null)),
@@ -237,10 +336,10 @@ export default function RiversData() {
           <h2 className="text-xl font-bold text-gray-800 mb-2">Rivers Data</h2>
           <select
             className="mb-2 ml-5 bg-slate-300 p-1 rounded-lg focus:ring focus:bg-white cursor-pointer"
-            value={selectedRegion}
-            onChange={(e) => handleButtonAClick('A')}
+            value={reach}
+            onChange={(e) => setReach(e.target.value)}
           >
-            <option value="Tarbela">Tarbela</option>
+            <option value="Tarbela_to_Chashma">Tarbela</option>
             <option value="Chashma">Chashma</option>
           </select>
           {error && <p style={{ color: "red" }}>Error: {error}</p>}
@@ -251,13 +350,13 @@ export default function RiversData() {
               <tr className="bg-gray-200">
                 <th className="px-2 py-1 text-left text-sm font-semibold text-gray-800 border-b border-gray-300">Date</th>
                 <th className="px-2 py-1 text-left text-sm font-semibold text-gray-800 border-b border-gray-300">
-                  {selectedRegion === "Tarbela" ? "Tarbela Outflows" : "Chashma Upstream"}
+                  {reach === "Tarbela_to_Chashma" ? "Tarbela Outflows" : "Chashma Upstream"}
                 </th>
                 <th className="px-2 py-1 text-left text-sm font-semibold text-gray-800 border-b border-gray-300">
-                  {selectedRegion === "Tarbela" ? "Kabul River" : "Loss and Gain"}
+                  {reach === "Tarbela_to_Chashma" ? "Kabul River" : "Loss and Gain"}
                 </th>
                 <th className="px-2 py-1 text-left text-sm font-semibold text-gray-800 border-b border-gray-300">
-                  {selectedRegion === "Tarbela" ? "Thal Canal" : "Chashma Downstream"}
+                  {reach === "Tarbela_to_Chashma" ? "Thal Canal" : "Chashma Downstream"}
                 </th>
               </tr>
             </thead>
@@ -268,13 +367,13 @@ export default function RiversData() {
                     {`${item.Name}`}
                   </td>
                   <td className="px-2 py-1 border-b border-gray-300">
-                    {selectedRegion === "Tarbela" ? item.name : item.chashma_upstream}
+                    {reach === "Tarbela_to_Chashma" ? item.Date : item.Tarbela_Outflows}
                   </td>
                   <td className="px-2 py-1 border-b border-gray-300">
-                    {selectedRegion === "Tarbela" ? item.kabul_river : item.loss_and_gain}
+                    {reach === "Tarbela_to_Chashma" ? item.kabul_river : item.loss_and_gain}
                   </td>
                   <td className="px-2 py-1 border-b border-gray-300">
-                    {selectedRegion === "Tarbela" ? item.thal_canal : item.chashma_downstream}
+                    {reach === "Tarbela_to_Chashma" ? item.thal_canal : item.chashma_downstream}
                   </td>
                 </tr>
               ))}

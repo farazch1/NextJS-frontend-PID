@@ -103,6 +103,7 @@ export default function Dashboard() {
             <h2 className="text-lg font-semibold text-green-700 mt-2">Precipitation</h2>
             <p className="text-sm text-gray-600">01-Jan-2000 to 27-Feb-2024</p>
           </div>
+          <input type="checkbox" name="" id="" />
 
           {/* Temperature Box */}
           <div className="bg-orange-100 p-4 rounded-lg shadow-md flex flex-col items-center">
