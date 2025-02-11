@@ -236,6 +236,19 @@ export default function Layout({ children }) {
               
             </ListItem>
 
+            <ListItem key="RiversDataMap"
+              disablePadding
+              className={pathname.startsWith("/riversdatamap") ? "text-sky-600" : "text-slate-700"}
+              onClick={() => { router.push("/riversdatamap") }}>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <WavesIcon sx={{ color: 'blue' }} />
+                  </ListItemIcon>
+                  <ListItemText primary="Rivers Data Map" />
+                </ListItemButton>
+              
+            </ListItem>
+
 
             {/* Forecast Dropdown */}
             <ListItem key="Forecast" disablePadding className={pathname.startsWith("/forecast") ? "text-sky-600" : "text-slate-700"} onClick={() => { router.push("/forecast") }}>
