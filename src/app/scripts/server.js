@@ -19,20 +19,25 @@ app.get('/rivers-data', (req, res) => {
   const reach = req.query.reach;
   const startDate = req.query.startdate;
   const endDate = req.query.enddate;
-  const riv_selection = req.query.riv_selection;
+  const riv_selection_tg = req.query.riv_selection_tg;
+  const riv_selection_tc = req.query.riv_selection_tc;
 
   // Validate parameters
-  if (!reach || !startDate || !endDate || (reach == "Taunsa_to_Guddu" && !riv_selection)) {
+  if (!reach || !startDate || !endDate || (reach == "Taunsa_to_Guddu" && !riv_selection_tg) || (reach == "Tarbela_to_Chashma" && !riv_selection_tc)) {
     return res.status(400).send({ message: 'Missing required query parameters: name or date' });
   }
 
   // Ensure the table name is sanitized
   const allowedTables = ['Tarbela_to_Chashma', 'Chashma_to_Taunsa', 'Taunsa_to_Guddu', 'Guddu_to_Sukkur', 'Sukkur_to_Kotri']; // Add your valid table names here
-  const allowedRivers = ['Pnj', 'Guddu']
+  const allowedRivers_tc = ['Tarbela', 'Chashma'];
+  const allowedRivers_tg = ['Pnj', 'Guddu'];
   if (!allowedTables.includes(reach)) {
     return res.status(400).send({ message: 'Invalid table name' });
   }
-  if(reach == "Taunsa_to_Guddu" && !allowedRivers.includes(riv_selection)){
+  if(reach == "Taunsa_to_Guddu" && !allowedRivers_tg.includes(riv_selection_tg)){
+    return res.status(400).send({message: "Invalid river"})
+  }
+  if(reach == "Tarbela_to_Chashma" && !allowedRivers_tc.includes(riv_selection_tc)){
     return res.status(400).send({message: "Invalid river"})
   }
 
@@ -41,13 +46,18 @@ app.get('/rivers-data', (req, res) => {
   switch(reach)
   {
     case 'Tarbela_to_Chashma':
-      dateCol = "Date";
+      if(riv_selection_tc == "Tarbela"){
+        dateCol = "Date";
+      }
+      else{
+        dateCol = "Chashma_Date";
+      }
       break;
     case 'Chashma_to_Taunsa':
       dateCol = "Taunsa_Date";
       break;
     case 'Taunsa_to_Guddu':
-      if(riv_selection == "Pnj"){
+      if(riv_selection_tg == "Pnj"){
         dateCol = "Pnj_Date";
       }
       else{
