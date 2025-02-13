@@ -202,20 +202,20 @@ export default function RiversData() {
               </tr>
             </thead>
             <tbody>
-              {data.map((item, index) => (
-                <tr key={index}>
-                  {orderedKeys.map(key => (
-                    <td 
-                      key={key}
-                      className="px-2 py-1 border-b border-gray-300"
-                    >
-                      {key.toLowerCase().includes('date') 
-                        ? formatDate(item[key])
-                        : item[key]}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+            {data.map((item, index) => (
+              <tr key={index}>
+                {orderedKeys.map(key => (
+                  <td 
+                    key={key}
+                    className="px-2 py-1 border-b border-gray-300"
+                  >
+                    {key.toLowerCase().includes('date') 
+                      ? formatDate(item[key])
+                      : item[key]}
+                  </td>
+                ))}
+              </tr>
+            ))}
             </tbody>
           </table>
         ) : (
