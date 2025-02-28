@@ -2,7 +2,7 @@ const express = require('express');
 const sql = require("msnodesqlv8");
 
 const app = express();
-const serverName = "LATUTUDE_7390\\SQLEXPRESS";
+const serverName = "LATUTUDE_7390\\SQLEXPRESS"
 const connectionString = "server=" + serverName + ";Database=Twin;Trusted_Connection=Yes;Driver={ODBC Driver 17 for SQL Server}";
 
 // Hardcoded lag time data
@@ -77,19 +77,35 @@ app.get('/rivers-data', async (req, res) => {
     // Calculate lag time
     const lagTime = calculateLagTime(reach, startDate);
 
-    // Calculate loss and gain if reach is Tarbela_to_Chashma and riv_selection_tc is Chashma
+    // Calculate loss and gain for all reaches
     let result = rows;
-    if (reach === "Tarbela_to_Chashma" && riv_selection_tc === "Chashma") {
+    if (
+      (reach === "Tarbela_to_Chashma" && riv_selection_tc === "Chashma") ||
+      reach === "Chashma_to_Taunsa" ||
+      reach === "Taunsa_to_Guddu" ||
+      reach === "Guddu_to_Sukkur" ||
+      reach === "Sukkur_to_Kotri"
+    ) {
       result = await calculateLossAndGain(rows, lagTime, reach);
     }
 
-    // // Add lag time to the result
-    // result = result.map(row => ({
-    //   ...row,
-    // }));
-
     res.json(result);
   });
+});
+
+
+app.get('/one-time-data', async (req, res) => {
+  const reach = req.query.reach;
+  const date = req.query.date;
+  const riv_selection_tg = req.query.riv_selection_tg;
+  const riv_selection_tc = req.query.riv_selection_tc;
+
+
+
+
+
+
+  
 });
 
 // Function to calculate loss and gain
@@ -97,25 +113,84 @@ async function calculateLossAndGain(rows, lagTime, reach) {
   const updatedRows = [];
 
   for (const row of rows) {
-    const currentDate = new Date(row.Chashma_Date);
+    let currentDate, upstreamCol, downstreamCol, lagRowDateCol, lagRowTable;
+
+    // Determine the date column, upstream flow column, and downstream flow column based on the reach
+    if (reach === "Tarbela_to_Chashma") {
+      currentDate = new Date(row.Chashma_Date);
+      upstreamCol = "Chashma_upstream";
+      downstreamCol = "Bal_for_Chashma";
+      lagRowDateCol = "Date"; // Lag row is fetched based on Tarbela's Date
+      lagRowTable = "Tarbela_to_Chashma";
+    } else if (reach === "Chashma_to_Taunsa") {
+      currentDate = new Date(row.Taunsa_Date);
+      upstreamCol = "Taunsa_U_S";
+      downstreamCol = "Chashma_downstream";
+      lagRowDateCol = "Chashma_Date"; // Lag row is fetched based on Chashma_Date
+      lagRowTable = "Tarbela_to_Chashma";
+    } else if (reach === "Taunsa_to_Guddu") {
+      currentDate = new Date(row.Guddu_Date);
+      upstreamCol = "Guddu_U_S";
+      downstreamCol = "Taunsa_D_S";
+      lagRowDateCol = "Taunsa_Date"; // Lag row is fetched based on Taunsa_Date
+      lagRowTable = "Chashma_to_Taunsa";
+    } else if (reach === "Guddu_to_Sukkur") {
+      currentDate = new Date(row.Sukkur_Date);
+      upstreamCol = "Sukkur_U_S";
+      downstreamCol = "Guddu_D_S";
+      lagRowDateCol = "Guddu_Date"; // Lag row is fetched based on Guddu_Date
+      lagRowTable = "Taunsa_to_Guddu";
+    } else if (reach === "Sukkur_to_Kotri") {
+      currentDate = new Date(row.Kotri_Date);
+      upstreamCol = "Kotri_U_S";
+      downstreamCol = "Sukkur_D_S";
+      lagRowDateCol = "Sukkur_Date"; // Lag row is fetched based on Sukkur_Date
+      lagRowTable = "Guddu_to_Sukkur";
+    } else {
+      // Handle other reaches if needed
+      updatedRows.push({ ...row, Loss_and_Gain: null });
+      continue;
+    }
+
     const lagDate = new Date(currentDate);
     lagDate.setDate(lagDate.getDate() - lagTime);
 
     // Fetch the corresponding row for the lag date
-    const lagRow = await fetchRowForDate(reach, lagDate);
+    const lagRow = await fetchRowForDate(lagRowTable, lagDate, lagRowDateCol);
 
     if (lagRow) {
-      const lossAndGain = row.Chashma_upstream - lagRow.Bal_for_Chashma;
-      console.log("CHASHMA U_S",row.Chashma_upstream);
-      console.log("BAL FOR CHASHMA",lagRow.Bal_for_Chashma);
+      let lossAndGain;
+
+      // Calculate loss and gain based on the reach
+      if (reach === "Tarbela_to_Chashma") {
+        lossAndGain = row[upstreamCol] - lagRow[downstreamCol];
+      } else if (reach === "Chashma_to_Taunsa") {
+        lossAndGain = row[upstreamCol] - lagRow[downstreamCol];
+      } else if (reach === "Taunsa_to_Guddu") {
+        const punDS = row.Pun_D_S; // Pun D/S from the current row
+        const gudduUS = row[upstreamCol]; // Guddu U/S from the current row
+        const taunsaDS = lagRow[downstreamCol]; // Taunsa D/S from the lag row
+        lossAndGain = gudduUS + punDS - taunsaDS;
+      } else if (reach === "Guddu_to_Sukkur") {
+        lossAndGain = row[upstreamCol] - lagRow[downstreamCol];
+      } else if (reach === "Sukkur_to_Kotri") {
+        lossAndGain = row[upstreamCol] - lagRow[downstreamCol];
+      }
+
+      console.log("UPSTREAM FLOW:", row[upstreamCol]);
+      console.log("DOWNSTREAM FLOW:", lagRow[downstreamCol]);
+      console.log("LOSS AND GAIN:", lossAndGain);
+
+      // Add the result to the updated row
       updatedRows.push({
         ...row,
-        Loss_and_Gain: lossAndGain
+        Loss_and_Gain: lossAndGain,
       });
     } else {
+      console.log("No lag row found for date:", lagDate);
       updatedRows.push({
         ...row,
-        Loss_and_Gain: null // If no matching row is found
+        Loss_and_Gain: null,
       });
     }
   }
@@ -124,12 +199,11 @@ async function calculateLossAndGain(rows, lagTime, reach) {
 }
 
 // Function to fetch a row for a specific date
-function fetchRowForDate(reach, date) {
+function fetchRowForDate(table, date, dateCol) {
   return new Promise((resolve, reject) => {
-    const dateCol = reach === "Tarbela_to_Chashma" ? "Date" : "Chashma_Date";
     const formattedDate = date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
 
-    const query = `SELECT * FROM [${reach}] WHERE ${dateCol} = '${formattedDate}'`;
+    const query = `SELECT * FROM [${table}] WHERE ${dateCol} = '${formattedDate}'`;
     sql.query(connectionString, query, (err, rows) => {
       if (err) {
         console.error('Error fetching row for date:', err);
